@@ -10,6 +10,4 @@ export class User {
   name: string;
   @Column()
   password: string;
-  @Column()
-  isAdmin: boolean;
 }

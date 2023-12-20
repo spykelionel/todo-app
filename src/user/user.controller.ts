@@ -5,30 +5,40 @@ import {
   Controller,
   Delete,
   Get,
+  Injectable,
   Param,
   ParseIntPipe,
   Patch,
   PipeTransform,
   Post,
-  UsePipes,
 } from '@nestjs/common';
-import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
-import { ZodSchema } from 'zod';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 
-export class ZodValidationPipe implements PipeTransform {
-  constructor(private schema: ZodSchema) {}
-  transform(value: unknown, metadata: ArgumentMetadata) {
-    try {
-      const parsedValue = this.schema.parse(value);
-      return parsedValue;
-    } catch (error) {
+@Injectable()
+export class ValidationPipe implements PipeTransform<any> {
+  async transform(value: any, { metatype }: ArgumentMetadata) {
+    if (!metatype || this.toValidate(metatype)) {
+      return value;
+    }
+    const object = plainToInstance(metatype, value);
+    const errors = await validate(object);
+    if (errors.length > 0) {
       throw new BadRequestException(
         'Field/Value validation failed. Make sure all fields are valid',
       );
     }
+
+    return value;
+  }
+
+  toValidate(metatype: Function) {
+    const types: Function[] = [String, Array, Object];
+    return !types.includes(metatype);
   }
 }
 
@@ -37,7 +47,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @UsePipes(new ZodValidationPipe(createUserSchema))
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }

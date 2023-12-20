@@ -10,8 +10,9 @@ import {
   Patch,
   PipeTransform,
   Post,
+  UsePipes,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
@@ -24,7 +25,9 @@ export class ZodValidationPipe implements PipeTransform {
       const parsedValue = this.schema.parse(value);
       return parsedValue;
     } catch (error) {
-      throw new BadRequestException('Validation failed');
+      throw new BadRequestException(
+        'Field/Value validation failed. Make sure all fields are valid',
+      );
     }
   }
 }
@@ -34,9 +37,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(
-    @Body('createUserDto', ZodValidationPipe) createUserDto: CreateUserDto,
-  ) {
+  @UsePipes(new ZodValidationPipe(createUserSchema))
+  create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 

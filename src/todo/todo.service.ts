@@ -18,7 +18,7 @@ export class TodoService {
     }
   }
 
-  findAll(): Promise<Todo[]> {
+  findAll(): Promise<Todo[] | []> {
     return this.todoRepository.find();
   }
 

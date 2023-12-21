@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const updateTodoSchema = z
+export const updateTodoSchema = z
   .object({
     title: z.string(),
   })

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
@@ -10,12 +10,16 @@ export class TodoService {
   constructor(
     @InjectRepository(Todo) private readonly todoRepository: Repository<Todo>,
   ) {}
-  create(createTodoDto: CreateTodoDto): Promise<InsertResult> {
-    return this.todoRepository.insert(createTodoDto);
+  create(createTodoDto: CreateTodoDto, user: any) {
+    try {
+      return this.todoRepository.insert({ ...createTodoDto, user });
+    } catch (error) {
+      return error;
+    }
   }
 
-  findAll() {
-    return `This action returns all todo`;
+  findAll(): Promise<Todo[]> {
+    return this.todoRepository.find();
   }
 
   findOne(id: number) {

@@ -16,7 +16,7 @@ export class AuthService implements IAuthInterface {
     if (!user) return 'Credentials do not match.';
     if (user?.password !== password)
       throw new UnauthorizedException('You are not authorized');
-    const payload = { sub: user.id, password };
+    const payload = { ...user };
     const access_token = await this.jwtService.signAsync(payload);
 
     return access_token;

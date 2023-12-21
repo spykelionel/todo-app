@@ -11,7 +11,7 @@ export class AuthService implements IAuthInterface {
     private userService: UserService,
   ) {}
 
-  async signIn(email: string, password: string): Promise<string> {
+  async signIn(email: string, password: string): Promise<string | any> {
     const user = await this.userService.findByEmail(email);
     if (!user) return 'Credentials do not match.';
     if (user?.password !== password)
@@ -19,7 +19,11 @@ export class AuthService implements IAuthInterface {
     const payload = { ...user };
     const access_token = await this.jwtService.signAsync(payload);
 
-    return access_token;
+    return {
+      ...payload,
+      password: undefined,
+      access_token,
+    };
   }
   async signOut(): Promise<string> {
     return 'You are now signed out of the application.';

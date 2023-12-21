@@ -9,6 +9,9 @@ export class Todo {
   @Column()
   title: string;
 
-  @ManyToOne((type) => User, (user) => user.todos, { nullable: false })
+  @ManyToOne((type) => User, (user) => user.todos, {
+    nullable: false,
+    eager: true,
+  })
   user: User;
 }

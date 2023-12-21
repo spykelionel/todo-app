@@ -11,6 +11,6 @@ export class User {
   @Column()
   password: string;
 
-  @OneToMany((type) => Todo, (todo) => todo.user)
+  @OneToMany((type) => Todo, (todo) => todo.user, { nullable: true })
   todos: Todo[];
 }

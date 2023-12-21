@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/util/ValidationSchema';
 import { CreateTodoDto, createTodoSchema } from './dto/create-todo.dto';
-import { UpdateTodoDto } from './dto/update-todo.dto';
+import { UpdateTodoDto, updateTodoSchema } from './dto/update-todo.dto';
 import { TodoService } from './todo.service';
 
 @Controller('todo')
@@ -34,6 +34,7 @@ export class TodoController {
   }
 
   @Patch(':id')
+  @UsePipes(new ZodValidationPipe(updateTodoSchema))
   update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
     return this.todoService.update(+id, updateTodoDto);
   }

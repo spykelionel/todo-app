@@ -25,9 +25,10 @@ export class TodoService {
   async findOne(id: number) {
     try {
       const todo = await this.todoRepository.findOneBy({ id });
-      if (todo!) {
-        console.log(todo);
+      if (todo) {
         return todo;
+      } else {
+        return {};
       }
     } catch (error) {
       throw new NotFoundException('Could not get specific todo');

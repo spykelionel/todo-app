@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto';
@@ -22,8 +22,16 @@ export class TodoService {
     return this.todoRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} todo`;
+  async findOne(id: number) {
+    try {
+      const todo = await this.todoRepository.findOneBy({ id });
+      if (todo!) {
+        console.log(todo);
+        return todo;
+      }
+    } catch (error) {
+      throw new NotFoundException('Could not get specific todo');
+    }
   }
 
   update(id: number, updateTodoDto: UpdateTodoDto) {

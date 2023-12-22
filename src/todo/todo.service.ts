@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto';
@@ -35,8 +40,28 @@ export class TodoService {
     }
   }
 
-  update(id: number, updateTodoDto: UpdateTodoDto) {
-    return `This action updates a #${id} todo`;
+  async update(id: number, updateTodoDto: UpdateTodoDto) {
+    const todo = await this.findOne(id);
+    if (!todo) {
+      return {
+        message: 'Could not update an unknown todo',
+        statusCode: HttpStatus.NOT_FOUND,
+      };
+    }
+
+    try {
+      const updatedTodo = await this.todoRepository.update(
+        { id },
+        updateTodoDto,
+      );
+      return {
+        ...todo,
+        title: updateTodoDto.title,
+        affected: updatedTodo.affected,
+      };
+    } catch (error) {
+      throw new BadRequestException(error, 'Could not perform this request.');
+    }
   }
 
   remove(id: number) {

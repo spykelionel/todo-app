@@ -64,7 +64,22 @@ export class TodoService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} todo`;
+  async remove(id: number) {
+    const todo = await this.findOne(id);
+    if (!todo) {
+      return {
+        message: 'Could not update an unknown todo',
+        statusCode: HttpStatus.NOT_FOUND,
+      };
+    }
+    try {
+      const deletedTodo = await this.todoRepository.delete({ id });
+      return {
+        affected: deletedTodo.affected,
+        message: 'Todo successfully deleted',
+      };
+    } catch (error) {
+      throw new BadRequestException(error, 'Could not perform this request.');
+    }
   }
 }

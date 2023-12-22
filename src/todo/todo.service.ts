@@ -1,10 +1,12 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -40,7 +42,7 @@ export class TodoService {
     }
   }
 
-  async update(id: number, updateTodoDto: UpdateTodoDto) {
+  async update(id: number, updateTodoDto: UpdateTodoDto, user: any) {
     const todo = await this.findOne(id);
     if (!todo) {
       return {
@@ -50,6 +52,9 @@ export class TodoService {
     }
 
     try {
+      if ((todo as Todo).user.id !== (user as User).id) {
+        throw new ForbiddenException();
+      }
       const updatedTodo = await this.todoRepository.update(
         { id },
         updateTodoDto,
@@ -64,7 +69,8 @@ export class TodoService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: any) {
+    console.log(user);
     const todo = await this.findOne(id);
     if (!todo) {
       return {
@@ -73,6 +79,9 @@ export class TodoService {
       };
     }
     try {
+      if ((todo as Todo).user.id !== (user as User).id) {
+        throw new ForbiddenException();
+      }
       const deletedTodo = await this.todoRepository.delete({ id });
       return {
         affected: deletedTodo.affected,

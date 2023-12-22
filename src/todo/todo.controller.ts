@@ -41,13 +41,17 @@ export class TodoController {
   @Patch(':id')
   @UseGuards(AuthGuard)
   // @UsePipes(new ZodValidationPipe(updateTodoSchema))
-  update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
-    return this.todoService.update(+id, updateTodoDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateTodoDto: UpdateTodoDto,
+    @Request() req,
+  ) {
+    return this.todoService.update(+id, updateTodoDto, req.user);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
-    return this.todoService.remove(+id);
+  remove(@Param('id') id: string, @Request() req) {
+    return this.todoService.remove(+id, req.user);
   }
 }

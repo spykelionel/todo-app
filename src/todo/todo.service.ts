@@ -70,7 +70,6 @@ export class TodoService {
   }
 
   async remove(id: number, user: any) {
-    console.log(user);
     const todo = await this.findOne(id);
     if (!todo) {
       return {

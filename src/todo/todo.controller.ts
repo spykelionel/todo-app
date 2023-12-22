@@ -24,7 +24,6 @@ export class TodoController {
   @UseGuards(AuthGuard)
   @UsePipes(new ZodValidationPipe(createTodoSchema))
   create(@Body() createTodoDto: CreateTodoDto, @Request() req) {
-    console.log(req.user);
     return this.todoService.create(createTodoDto, req.user);
   }
 
